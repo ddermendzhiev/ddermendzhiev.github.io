@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  dir="ltr"
+  
+><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<title>Develop a Volatility Plugin to Recover ML Models | Memory Forensics on ML Processes | Dinko Dermendzhiev</title>
+
+<meta name="generator" content="Hugo Eureka 0.9.3" />
+<link rel="stylesheet" href="https://ddermendzhiev.github.io/css/eureka.min.9cec6350e37e534b0338fa9a085bf06855de3b0f2dcf857e792e5e97b07ea905d4d5513db554cbc26a9c3da622bae92d.css">
+<script defer src="https://ddermendzhiev.github.io/js/eureka.min.fa9a6bf6d7a50bb635b4cca7d2ba5cf3dfb095ae3798773f1328f7950028b48c17d06276594e1b5f244a25a6c969a705.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload"
+  href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&amp;family=Noto&#43;Serif&#43;SC:wght@400;600;700&amp;display=swap"
+  as="style" onload="this.onload=null;this.rel='stylesheet'">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.4.0/build/styles/base16/solarized-light.min.css"
+   media="print"
+  onload="this.media='all';this.onload=null" crossorigin>
+<script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.4.0/build/highlight.min.js"
+   crossorigin></script>
+  <script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.4.0/build/languages/dart.min.js"
+     crossorigin></script>
+<link rel="stylesheet" href="https://ddermendzhiev.github.io/css/highlightjs.min.2958991528e43eb6fc9b8c4f2b8e052f79c4010718e1d1e888a777620e9ee63021c2c57ec7417a3108019bb8c41943e6.css" media="print" onload="this.media='all';this.onload=null">
+
+
+<script defer type="text/javascript" src="https://ddermendzhiev.github.io/js/fontawesome.min.2eec90e3a2d89beec3a0edb9d29a99ba8e768e800e6177c4300e215277073b35c0ef2b862438363ac7b09eff2084dc3f.js"></script>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css"
+   integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ"  media="print"
+  onload="this.media='all';this.onload=null" crossorigin>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" 
+  integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY"  crossorigin></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js"
+   integrity="sha384-&#43;XBljXPPiv&#43;OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR"  crossorigin></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true }
+      ],
+    });
+  });
+</script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/mermaid@8.14.0/dist/mermaid.min.js" 
+  integrity="sha384-atOyb0FxAgN9LyAc6PEf9BjgwLISyansgdH8/VXQH8p2o5vfrRgmGIJ2Sg22L0A0"  crossorigin></script>
+
+
+
+<meta name="description"
+  content="Reverse engineering the CPython/PyTorch storage of models.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+      "@type": "ListItem",
+      "position": 1 ,
+      "name":"Docs",
+      "item":"https://ddermendzhiev.github.io/docs/"},{
+      "@type": "ListItem",
+      "position": 2 ,
+      "name":"Memory Forensics on ML Processes",
+      "item":"https://ddermendzhiev.github.io/docs/memoryforensicsonml/"},{
+      "@type": "ListItem",
+      "position": 3 ,
+      "name":"Develop a Volatility Plugin to Recover ML Models",
+      "item":"https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-5/"}]
+}
+</script>
+
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-5/"
+    },
+    "headline": "Develop a Volatility Plugin to Recover ML Models | Memory Forensics on ML Processes | Dinko Dermendzhiev","datePublished": "2023-06-01T00:00:00+00:00",
+    "dateModified": "2023-06-27T00:00:00+00:00",
+    "wordCount":  2769 ,
+    "publisher": {
+        "@type": "Person",
+        "name": "Dinko Dermendzhiev",
+        },
+    "description": "Reverse engineering the CPython\/PyTorch storage of models."
+}
+</script><meta property="og:title" content="Develop a Volatility Plugin to Recover ML Models | Memory Forensics on ML Processes | Dinko Dermendzhiev" />
+<meta property="og:type" content="article" />
+
+
+
+<meta property="og:url" content="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-5/" />
+
+
+
+<meta property="og:description" content="Reverse engineering the CPython/PyTorch storage of models." />
+
+
+
+<meta property="og:locale" content="en" />
+
+
+
+
+<meta property="og:site_name" content="Dinko Dermendzhiev" />
+
+
+
+
+
+
+<meta property="article:published_time" content="2023-06-01T00:00:00&#43;00:00" />
+
+
+<meta property="article:modified_time" content="2023-06-27T00:00:00&#43;00:00" />
+
+
+
+<meta property="article:section" content="docs" />
+
+
+
+
+
+  <body class="flex min-h-screen flex-col">
+    <header
+      class="min-h-16 pl-scrollbar bg-secondary-bg fixed z-50 flex w-full items-center shadow-sm"
+    >
+      <div class="mx-auto w-full max-w-screen-xl"><script>
+    let storageColorScheme = localStorage.getItem("lightDarkMode")
+    if (((storageColorScheme == 'Auto' || storageColorScheme == null) && window.matchMedia("(prefers-color-scheme: dark)").matches) || storageColorScheme == "Dark") {
+        document.getElementsByTagName('html')[0].classList.add('dark')
+    }
+</script>
+<nav class="flex items-center justify-between flex-wrap px-4 py-4 md:py-0">
+    <a href="/" class="me-6 text-primary-text text-xl font-bold">Dinko Dermendzhiev</a>
+    <button id="navbar-btn" class="md:hidden flex items-center px-3 py-2" aria-label="Open Navbar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div id="target"
+        class="hidden block md:flex md:grow md:justify-between md:items-center w-full md:w-auto text-primary-text z-20">
+        <div class="md:flex md:h-16 text-sm md:grow pb-4 md:pb-0 border-b md:border-b-0">
+            <a href="/docs/" class="block mt-4 md:inline-block md:mt-0 md:h-(16-4px) md:leading-(16-4px) box-border md:border-t-2 md:border-b-2  selected-menu-item  me-4">Docs</a>
+        </div>
+
+        <div class="flex">
+            <div class="relative pt-4 md:pt-0">
+                <div class="cursor-pointer hover:text-eureka" id="lightDarkMode">
+                    <i class="fas fa-adjust"></i>
+                </div>
+                <div class="fixed hidden inset-0 opacity-0 h-full w-full cursor-default z-30" id="is-open">
+                </div>
+                <div class="absolute flex flex-col start-0 md:start-auto end-auto md:end-0 hidden bg-secondary-bg w-48 rounded py-2 border border-tertiary-bg cursor-pointer z-40"
+                    id='lightDarkOptions'>
+                    <span class="px-4 py-1 hover:text-eureka" name="Light">Light</span>
+                    <span class="px-4 py-1 hover:text-eureka" name="Dark">Dark</span>
+                    <span class="px-4 py-1 hover:text-eureka" name="Auto">Auto</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed hidden inset-0 opacity-0 h-full w-full cursor-default z-0" id="is-open-mobile">
+    </div>
+
+</nav>
+<script>
+    
+    let element = document.getElementById('lightDarkMode')
+    if (storageColorScheme == null || storageColorScheme == 'Auto') {
+        document.addEventListener('DOMContentLoaded', () => {
+            window.matchMedia("(prefers-color-scheme: dark)").addEventListener('change', switchDarkMode)
+        })
+    } else if (storageColorScheme == "Light") {
+        element.firstElementChild.classList.remove('fa-adjust')
+        element.firstElementChild.setAttribute("data-icon", 'sun')
+        element.firstElementChild.classList.add('fa-sun')
+    } else if (storageColorScheme == "Dark") {
+        element.firstElementChild.classList.remove('fa-adjust')
+        element.firstElementChild.setAttribute("data-icon", 'moon')
+        element.firstElementChild.classList.add('fa-moon')
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        getcolorscheme();
+        switchBurger();
+    });
+</script>
+</div>
+    </header>
+    <main class="grow pt-16">
+        <div class="pl-scrollbar">
+          <div class="mx-auto w-full max-w-screen-xl lg:px-4 xl:px-8">
+
+
+<div class="lg:pt-12">
+    <div class="flex flex-col md:flex-row bg-secondary-bg rounded">
+        <div class="md:w-1/4 lg:w-1/5 border-e">
+            <div class="sticky top-16 pt-6">
+                
+
+
+
+
+
+
+
+
+
+
+<div id="sidebar-title" class="md:hidden mx-4 px-2 pt-4 pb-2 md:border-b text-tertiary-text md:text-primary-text">
+    <span class="font-semibold">Table of Contents</span>
+    <i class='fas fa-caret-right ms-1'></i>
+</div>
+
+<div id="sidebar-toc"
+    class="hidden md:block overflow-y-auto mx-6 md:mx-0 pe-6 pt-2 md:max-h-doc-sidebar bg-primary-bg md:bg-transparent">
+    <div class="flex flex-wrap ms-4 -me-2 p-2 bg-secondary-bg md:bg-primary-bg rounded">
+        <a class=" hover:text-eureka"
+            href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/">Memory Forensics on ML Processes</a>
+        
+        
+        
+
+
+    </div>
+    
+<ul class="ps-6">
+    
+    
+    
+    <li class="py-2">
+        <div class="">
+            <a class=" hover:text-eureka"
+                href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-1/">Build a Convolutional Neural Network</a>
+        </div>
+        
+    </li>
+    
+    
+    
+    
+    <li class="py-2">
+        <div class="">
+            <a class=" hover:text-eureka"
+                href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-2/">Inspect the Running Python ML Process</a>
+        </div>
+        
+    </li>
+    
+    
+    
+    
+    <li class="py-2">
+        <div class="">
+            <a class=" hover:text-eureka"
+                href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-3/">Gather a Memory Image of the System</a>
+        </div>
+        
+    </li>
+    
+    
+    
+    
+    <li class="py-2">
+        <div class="">
+            <a class=" hover:text-eureka"
+                href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-4/">Inspect the Memory Image</a>
+        </div>
+        
+    </li>
+    
+    
+    
+    
+    <li class="py-2">
+        <div class="">
+            <a class=" text-eureka  hover:text-eureka"
+                href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-5/">Develop a Volatility Plugin to Recover ML Models</a>
+        </div>
+        
+    </li>
+    
+    
+</ul>
+
+</div>
+
+
+
+
+
+            </div>
+
+        </div>
+        <div class="w-full md:w-3/4 lg:w-4/5 pb-8 pt-2 md:pt-8">
+            <div class="flex">
+                <div class="w-full lg:w-3/4 px-6">
+                    <article class="prose">
+  <h1 class="mb-4">Develop a Volatility Plugin to Recover ML Models</h1>
+
+  <div
+  class="text-tertiary-text not-prose mt-2 flex flex-row flex-wrap items-center"
+>
+  <div class="me-6 my-2">
+    <i class="fas fa-calendar me-1"></i>
+    <span
+      >2023-06-01</span
+    >
+  </div>
+  <div class="me-6 my-2">
+    <i class="fas fa-clock me-1"></i>
+    <span>13 min read</span>
+  </div>
+
+  
+
+  
+</div>
+
+
+  
+  
+
+  <p>The goal is to create a Volatility3 plugin that will traverse through the memory image to find PyTorch models and extract their attributes and data. The runtime state of a Python process is managed by a structure called <a href="https://github.com/python/cpython/blob/v3.10.6/Include/internal/pycore_runtime.h#L61">PyRuntimeState</a>. How can you locate this object in your memory image?</p>
+<ol>
+<li>Find the Python3 exe in your file system. Now use <a href="https://man7.org/linux/man-pages/man1/readelf.1.html">readelf</a> with the <strong>-s</strong> flag to output the symbol table of the file. Pipe the output through <a href="https://docs.oracle.com/cd/E19253-01/806-7612/filesearch-96061/index.html#:~:text=You%20can%20use%20the%20grep,of%20the%20command%20through%20grep%20.">grep</a>, searching for &lsquo;PyRuntime&rsquo;.</li>
+</ol>
+<p><strong>Note:</strong> The symbol table provides you with offsets to structures inside the process.</p>
+<pre><code class="language-shell">/usr/bin$ readelf python3.10 -s | grep PyRuntime
+</code></pre>
+<p><img src="/PyRuntimeSymbol.jpg" alt="image"></p>
+<p>The PyRuntimeState structure can be found by adding the offset (0x05a3a20) to the base address of the executable&rsquo;s VMA (0x555555554000). The result is 0x555555AF7A20.</p>
+<ol start="2">
+<li>To find objects, make use of the fact that Python has built-in garbage collection (GC). Python&rsquo;s GC protocol manages a <em>_gc_runtime_state</em> object. In Python3.8 and below, the GC object used to be stored directly in PyRuntimeState, but it is <a href="https://github.com/python/cpython/issues/81035#issuecomment-1093823198">now stored</a> in PyInterpreterState. By scouring the <a href="https://github.com/python/cpython/tree/v3.10.6/Include/internal">core source files</a>, you would establish the following sequence:
+<ul>
+<li>
+<p><a href="https://github.com/python/cpython/blob/v3.10.6/Include/internal/pycore_runtime.h#L83">pointer to PyInterpreterState</a> at offset 40 (bytes) of PyRuntimeState.</p>
+</li>
+<li>
+<p><a href="https://github.com/python/cpython/blob/v3.10.6/Include/internal/pycore_interp.h#L232">_gc_runtime_state</a> at offset 616 of PyInterpreterState.</p>
+</li>
+<li>
+<p><a href="https://github.com/python/cpython/blob/v3.10.6/Include/internal/pycore_gc.h#L140">pointer to head of the GC object list</a>, at offset 24 of _gc_runtime_state.</p>
+</li>
+</ul>
+</li>
+</ol>
+<p><strong>Note:</strong> In this example, I am using Python v3.10.6. Your offsets might vary depending on your version of Python, so select the correct branch in GitHub.</p>
+<p>At this point, it is as simple as traversing the DLL of PyGC_Head objects. For reference, here is the memory layout of Python objects (<a href="https://devguide.python.org/internals/garbage-collector/index.html#memory-layout-and-object-structure">GC design</a>):</p>
+<pre><code class="language-python">                                       Python Object Structure
+
+
+                          +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ \
+                          |                    *_gc_next                  | |
+                          +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ | PyGC_Head
+                          |                    *_gc_prev                  | |
+            object -----&gt; +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ /
+                          |                    ob_refcnt                  | \
+                          +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ | PyObject_HEAD
+                          |                    *ob_type                   | |
+                          +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ /
+                          |                      ...                      |
+</code></pre>
+<ol start="3">
+<li>Start <a href="https://volatility3.readthedocs.io/en/latest/volshell.html">VolShell</a>, an interactive tool of Volatility. It allows you to manually traverse through memory and confirm the offsets you calculated.</li>
+</ol>
+<pre><code class="language-shell">/volatility3$ python3 volshell.py -f ../LiME/images/memdump.lime -l
+Volshell (Volatility 3 Framework) 2.4.2
+Readline imported successfully	Stacking attempts finished                 
+
+    Call help() to see available functions
+
+    Volshell mode        : Linux
+    Current Layer        : layer_name
+    Current Symbol Table : symbol_table_name1
+    Current Kernel Name  : kernel
+
+(layer_name) &gt;&gt;&gt;
+</code></pre>
+<ol start="4">
+<li>Change the context to the correct process. Now you can reference addresses relative to the starting VMA of process 3391.</li>
+</ol>
+<pre><code class="language-shell">(layer_name) &gt;&gt;&gt; ct(pid=3391)
+(layer_name_Process3391) &gt;&gt;&gt; 
+</code></pre>
+<ol start="5">
+<li>Use the <strong>db</strong> function to display bytes. Walk down the sequence you found in step 2, calculating addresses along the way. Visually check the locations of pointers/addresses and other fields in the memory image to confirm they are where you expect them to be.</li>
+</ol>
+<p><strong>Notes:</strong></p>
+<ul>
+<li>Be aware of the architecture&rsquo;s <a href="https://en.wikipedia.org/wiki/Endianness">endianness</a></li>
+<li>I have marked the correct pointers with &lsquo;^&rsquo; characters</li>
+<li>I have shortened some of the outputs with &ldquo;&hellip;&rdquo;</li>
+</ul>
+<pre><code class="language-shell">(layer_name_Process3391) &gt;&gt;&gt; db(0x555555AF7A20, 48)
+0x555555af7a20    00 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00    ................
+0x555555af7a30    00 00 00 00 00 00 00 00 a0 e2 b3 55 55 55 00 00    ...........UUU..
+0x555555af7a40    70 fa b3 55 55 55 00 00 70 fa b3 55 55 55 00 00    p..UUU..p..UUU..
+                                          ^^^^^^^^^^^^^^^^^^^^^^^
+(layer_name_Process3391) &gt;&gt;&gt; db(0x555555b3fa70, 720)
+0x555555b3fa70    00 00 00 00 00 00 00 00 20 70 d6 5a 55 55 00 00    .........p.ZUU..
+0x555555b3fa80    20 7a af 55 55 55 00 00 00 00 00 00 00 00 00 00    .z.UUU..........
+0x555555b3fa90    ff ff ff ff ff ff ff ff 00 00 00 00 00 00 00 00    ................
+0x555555b3faa0    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
+0x555555b3fab0    e8 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
+0x555555b3fac0    f0 b5 b5 55 55 55 00 00 00 00 00 00 00 00 00 00    ...UUU..........
+0x555555b3fad0    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
+...
+0x555555b3fce0    00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00    ................
+0x555555b3fcf0    f0 e6 6f 51 ff 7f 00 00 b0 49 29 54 ff 7f 00 00    ..oQ.....I)T....
+0x555555b3fd00    bc 02 00 00 79 01 00 00 50 89 fa 5a 55 55 00 00    ....y...P..ZUU..
+0x555555b3fd10    90 d3 6f 51 ff 7f 00 00 0a 00 00 00 06 00 00 00    ..oQ............
+0x555555b3fd20    70 80 d0 f6 ff 7f 00 00 f0 bd 7b 51 ff 7f 00 00    p.........{Q....
+0x555555b3fd30    0a 00 00 00 02 00 00 00 f0 fc b3 55 55 55 00 00    ...........UUU..
+                                          ^^^^^^^^^^^^^^^^^^^^^^^
+(layer_name_Process3391) &gt;&gt;&gt; db(0x555555b3fcf0)
+0x555555b3fcf0    f0 e6 6f 51 ff 7f 00 00 b0 49 29 54 ff 7f 00 00    ..oQ.....I)T....
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+0x555555b3fd00    bc 02 00 00 79 01 00 00 50 89 fa 5a 55 55 00 00    ....y...P..ZUU..
+0x555555b3fd10    90 d3 6f 51 ff 7f 00 00 0a 00 00 00 06 00 00 00    ..oQ............
+0x555555b3fd20    70 80 d0 f6 ff 7f 00 00 f0 bd 7b 51 ff 7f 00 00    p.........{Q....
+0x555555b3fd30    0a 00 00 00 02 00 00 00 f0 fc b3 55 55 55 00 00    ...........UUU..
+0x555555b3fd40    40 fd b3 55 55 55 00 00 40 fd b3 55 55 55 00 00    @..UUU..@..UUU..
+0x555555b3fd50    00 00 00 00 00 00 00 00 87 01 00 00 00 00 00 00    ................
+0x555555b3fd60    cd 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
+
+(layer_name_Process3391) &gt;&gt;&gt; db(0x7fff516fe6f0)
+0x7fff516fe6f0    50 e1 6f 51 ff 7f 00 00 f0 fc b3 55 55 55 00 00    P.oQ.......UUU..
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+0x7fff516fe700    01 00 00 00 00 00 00 00 a0 66 3c 59 55 55 00 00    .........f&lt;YUU..
+0x7fff516fe710    00 00 00 00 00 00 00 00 20 2f 13 5b 55 55 00 00    ........./.[UU..
+...
+
+# At this point, you are at the 2nd object and can continue traversing via _gc_next pointers
+
+</code></pre>
+<p>I wrote a plugin - <a href="">PyListObjects.py</a> - to automate the traversal of GC objects and output the object types and virtual addresses. Here is how you can do it:</p>
+<ol start="6">
+<li>Create a new .py file in <strong>volatility3/frameworks/plugins/</strong>. Plugin classes must inherit from PluginInterface. Specify the plugin and framework versions, and provide an implementation of the requirements method (classmethods run before class instantiation). The module req specifies the required symbol table (kernel symbols) and translation layer architecture (Intel64). The plugin req indicates the use of another plugin (recall pslist). Finally, list requirements specify arguments that must be provided at the start of execution.</li>
+</ol>
+<pre><code class="language-python">from volatility3.framework import interfaces
+from volatility3.framework import renderers
+from volatility3.framework.configuration import requirements
+from volatility3.framework.objects import utility
+from volatility3.plugins.linux import pslist
+
+class PyListObjects(interfaces.plugins.PluginInterface):
+
+    _version = (1, 0, 0)                                # Plugin version
+    _required_framework_version = (2, 0, 0)             # Volatility version
+
+    @classmethod
+    def get_requirements(cls):
+        return [
+            requirements.ModuleRequirement(
+                name          = &quot;kernel&quot;,
+                description   = &quot;Linux kernel&quot;,
+                architectures = [&quot;Intel64&quot;],
+            ),
+            requirements.PluginRequirement(
+                name = &quot;pslist&quot;, plugin=pslist.PsList, version=(2, 0, 0)
+            ),
+            requirements.ListRequirement(
+                name         = &quot;pid&quot;,
+                description  = &quot;PID of the Python process in question&quot;,
+                element_type = int,
+                optional     = False,
+            ),
+            requirements.ListRequirement(
+                name         = &quot;PyRuntime&quot;,
+                description  = &quot;Offset of the PyRuntime symbol from your system's Python3 executable&quot;,
+                element_type = str,
+                optional     = False,
+            ),
+        ]
+</code></pre>
+<ol start="7">
+<li>The <strong>run()</strong> method is the entry point of a Volatility plugin (after requirements are satisfied). Here, you utilize two pslist classmethods to get a list of tasks that correspond to the pid(s) provided. That list is passed into the plugin workhorse, the <strong>_generator()</strong> method. A TreeGrid object is returned to specify the columns and data types Volatility should output. The output instances come from calls to <strong>yield()</strong>.</li>
+</ol>
+<pre><code class="language-python">def run(self):
+        filter_func = pslist.PsList.create_pid_filter(self.config.get(&quot;pid&quot;, None))
+        return renderers.TreeGrid(
+            [
+                (&quot;PID&quot;,         int),
+                (&quot;Process&quot;,     str),
+                (&quot;ObjectPtr&quot;,   str),
+                (&quot;Type&quot;,        str)
+            ],
+            self._generator(
+                pslist.PsList.list_tasks(
+                    self.context,
+                    self.config[&quot;kernel&quot;],
+                    filter_func = filter_func
+                )
+            ),
+        )
+</code></pre>
+<p><strong>Notes:</strong></p>
+<ul>
+<li>Refer to the <a href="https://volatility3.readthedocs.io/en/stable/volatility3.html">Volatility docs</a> for available functions, attributes, etc.</li>
+<li>Read the documentation/comments in <a href="">my repo</a> for more details</li>
+</ul>
+<ol start="8">
+<li>Acquire the first task in the list, because you expect to be given only one pid corresponding to the ML process. Return gracefully if the task is null or has no memory mapping. Next, recall the output of <strong>linux.proc</strong>. The mappings are given chronologically according to start address, and the first one will be the Python ELF. Create a process layer (a set of translational layers between virtual and physical address spaces) to use throughout the plugin. Finally, calculate the garabage collector address and call a <strong>get_objects()</strong> function to encapsulate functionality.</li>
+</ol>
+<pre><code class="language-python">def _generator(self, tasks):
+        task = list(tasks)[0]
+        if not task or not task.mm:
+            return
+
+        task_name = utility.array_to_string(task.comm)
+
+        vma = list(task.mm.get_mmap_iter())[0]              # first memory mapping is the Python executable/interpreter
+        vma_start = vma.vm_start                            # base virtual address 
+        path = vma.get_name(self.context, task)
+
+        task_layer = task.add_process_layer()
+        curr_layer = self.context.layers[task_layer]
+
+        pyrunstr = self.config.get('PyRuntime', None)[0]    # 'PyRuntime' arg from command line
+        try:
+            PyRuntimeOffset = int(pyrunstr, 16)             # offset of PyRuntimeState in the executable's VMA
+        except ValueError:
+            print(&quot;Invalid pyruntime hexadecimal string: &quot;, pyrunstr)
+
+        PyRuntimeState = vma_start + PyRuntimeOffset
+
+        PyIntrpState = int.from_bytes(                      # PyIntrpState ptr at offset 40 bytes
+            curr_layer.read(PyRuntimeState + 40, 8),
+            byteorder='little'
+        )
+        
+        PYGC_HEAD_OFFSET = 640      # first gc_generation at offset 640 bytes
+        ''' https://github.com/python/cpython/blob/v3.10.6/Include/internal/pycore_gc.h#L140) '''
+
+        object_map = get_objects(curr_layer, PyIntrpState, PYGC_HEAD_OFFSET)
+
+</code></pre>
+<ol start="9">
+<li>Create a dict that will map from address (unique) to type name. For each of the three GC generations, traverse through the doubly linked list and acquire the type name by accessing the PyTypeObject of each GC object. Add each entry into the dict/map with the address of PyGC_Head + 16 (bytes) because you want the base address of the PyObject itself.</li>
+</ol>
+<p><strong>Notes:</strong></p>
+<ul>
+<li>Every object in Python has a type specified by a <a href="https://docs.python.org/3/c-api/typeobj.html">PyTypeObject</a></li>
+<li>Find the <a href="https://docs.python.org/3.10/c-api/typeobj.html#c.PyTypeObject.tp_name">type name</a></li>
+<li>Although you could create your own objects to represent structures in memory (as you will see in the next plugin), here, it is smart optimize for runtime performance by reading and interpreting the bytes manually. Otherwise, you would be creating tens of thousands of GC objects for a marginal benefit in abstraction.</li>
+</ul>
+<pre><code class="language-python">def get_objects(curr_layer, PyIntrpState, PyGC_Head_Offset):
+    object_map = {}
+    for i in range(3):                                      # 3 GC generations (separated by 24 bytes)
+        PyGC_Head = int.from_bytes(
+            curr_layer.read(PyIntrpState + PyGC_Head_Offset, 8),
+            byteorder='little'
+        )
+        GC_Stop = int.from_bytes(                           # TAIL of the circular doubly linked list
+            curr_layer.read(PyGC_Head + 8, 8),
+            byteorder='little'
+        )
+        
+        while PyGC_Head != GC_Stop:
+            ptr_next = int.from_bytes(                      # next GC object
+                curr_layer.read(PyGC_Head, 8),
+                byteorder='little'
+            )
+            ptr_type = int.from_bytes(                      # ptr to PyTypeObject
+                curr_layer.read(PyGC_Head + 24, 8),
+                byteorder='little'
+            )
+            ptr_tp_name = int.from_bytes(                   # ptr to type name
+                curr_layer.read(ptr_type + 24, 8),
+                byteorder='little'
+            )
+            tp_name = hex_bytes_to_text(curr_layer.read(ptr_tp_name, 64, pad=True))
+
+            object_map[hex(PyGC_Head + 16)] = tp_name
+            PyGC_Head = ptr_next
+
+        PyGC_Head_Offset += 24
+
+    return object_map
+</code></pre>
+<ol start="10">
+<li>Back in <strong>_generator()</strong>, output the object map entries to Volatility using <strong>yield()</strong> and to a text file for ease of searching.</li>
+</ol>
+<pre><code class="language-python">with open(&quot;./PyListObjects.txt&quot;, 'w') as f:
+            for k,v in object_map.items():
+                f.write(json.dumps((k, v)))
+                f.write('\n')
+                yield (0,
+                    (
+                        task.pid,
+                        task_name,
+                        k,
+                        v,
+                    ),
+                )
+</code></pre>
+<p>You can see the example output of my memory image <a href="">here</a>. If you search for the addresses you obtained through the debugger, you will find them:</p>
+<pre><code class="language-python">[&quot;0x7fff5160e890&quot;, &quot;DataLoader&quot;]
+[&quot;0x7fff5160eb90&quot;, &quot;SGD&quot;]
+[&quot;0x7fff5160ea70&quot;, &quot;Net&quot;]
+</code></pre>
+<p><strong>Note:</strong> Take a second to see what other objects were found, such as Tensor and Parameter.</p>
+<p>Now that you found all objects, move to investigate the convolutional neural net. The plugin I created for this is <a href="">PyTorchFind.py</a>.</p>
+<ol start="11">
+<li>Follow the same workflow. The <strong>get_requirements()</strong> and <strong>run()</strong> methods are generally the same. The first notable difference is the use of symbols.</li>
+</ol>
+<pre><code class="language-python">python_table_name = PythonIntermedSymbols.create(
+    self.context, self.config_path, sub_path=&quot;generic&quot;, filename=&quot;python-3.10-x64&quot;
+)
+pytorch_table_name = PyTorchIntermedSymbols.create(
+    self.context, self.config_path, sub_path=&quot;generic&quot;, filename=&quot;pytorch-2.0-x64&quot;
+)
+</code></pre>
+<p>This code shows the instantiation of symbol tables for Python and PyTorch types. These tables are called upon to provide symbol information (class, attributes, and functions).</p>
+<ol start="12">
+<li>Create a file for each symbol table. Inherit from one of Volatility&rsquo;s symbol table base classes (this one reads JSON for type definitions). Bind each of your types to a class.</li>
+</ol>
+<pre><code class="language-python">from volatility3.framework.symbols import intermed
+from volatility3.framework import objects, constants
+
+class PythonIntermedSymbols(intermed.IntermediateSymbolTable):
+    &quot;&quot;&quot;
+    Symbol table for Python types.
+
+    - Developed for PyTorch 3.10.6 on x64 architectures
+    - Operability with other versions is not guaranteed
+    &quot;&quot;&quot;
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.set_type_class(&quot;PyGC_Head&quot;, PyGC_Head)                  # https://github.com/python/cpython/blob/v3.10.6/Include/internal/pycore_gc.h#L20
+        self.set_type_class(&quot;PyObject&quot;, PyObject)                    # https://github.com/python/cpython/blob/v3.10.6/Include/object.h#L109
+        self.set_type_class(&quot;PyTypeObject&quot;, PyTypeObject)            # https://github.com/python/cpython/blob/v3.10.6/Include/cpython/object.h#L191
+        self.set_type_class(&quot;PyDictObject&quot;, PyDictObject)            # https://github.com/python/cpython/blob/v3.10.6/Include/cpython/dictobject.h#L28
+        self.set_type_class(&quot;PyDictKeysObject&quot;, PyDictKeysObject)    # https://github.com/python/cpython/blob/main/Include/internal/pycore_dict.h#L72
+        self.set_type_class(&quot;PyDictKeyEntry&quot;, PyDictKeyEntry)        # https://github.com/python/cpython/blob/main/Include/internal/pycore_dict.h#L28
+        self.set_type_class(&quot;PyASCIIObject&quot;, PyASCIIObject)          # https://github.com/python/cpython/blob/3.10/Include/cpython/unicodeobject.h#L219
+        self.set_type_class(&quot;PyBoolObject&quot;, PyBoolObject)            # https://github.com/python/cpython/blob/v3.10.6/Include/boolobject.h#L22
+        self.set_type_class(&quot;PyLongObject&quot;, PyLongObject)            # https://github.com/python/cpython/blob/v3.10.6/Include/longintrepr.h#L85
+        self.set_type_class(&quot;PyTupleObject&quot;, PyTupleObject)          # https://github.com/python/cpython/blob/v3.10.6/Include/cpython/tupleobject.h#L11
+</code></pre>
+<p>For example, here is the JSON structure for a PyDictKeyEntry object. It specifies structure fields, field types, and relative offsets.</p>
+<pre><code class="language-json">&quot;PyDictKeyEntry&quot;: {
+  &quot;fields&quot;: {
+    &quot;me_hash&quot;: {
+      &quot;offset&quot;: 0,
+      &quot;type&quot;: {
+        &quot;kind&quot;: &quot;base&quot;,
+        &quot;name&quot;: &quot;unsigned long long&quot;
+      }
+    },
+    &quot;me_key&quot;: {
+      &quot;offset&quot;: 8,
+      &quot;type&quot;: {
+        &quot;kind&quot;: &quot;pointer&quot;,
+        &quot;subtype&quot;: {
+          &quot;kind&quot;: &quot;struct&quot;,
+          &quot;name&quot;: &quot;PyASCIIObject&quot;
+        }
+      }
+    },
+    &quot;me_value&quot;: {
+      &quot;offset&quot;: 16,
+      &quot;type&quot;: {
+        &quot;kind&quot;: &quot;pointer&quot;,
+        &quot;subtype&quot;: {
+          &quot;kind&quot;: &quot;struct&quot;,
+          &quot;name&quot;: &quot;PyObject&quot;
+        }
+      }
+    }
+  },
+  &quot;kind&quot;: &quot;struct&quot;,
+  &quot;size&quot;: 24
+}
+</code></pre>
+<p>This is the corresponding class implementation. Add any functionality you need the object to perform. The <strong>get_key()</strong> method dereferences the key pointer, which is specified to be a PyObject pointer, and then calls <strong>get_value()</strong> of the PyObject class.</p>
+<pre><code class="language-python">class PyDictKeyEntry(objects.StructType):
+    def get_key(self):
+        &quot;&quot;&quot;
+        Retrieves the value of the dict key (ASCII str).
+        &quot;&quot;&quot;
+        return self.me_key.dereference().get_value()
+</code></pre>
+<p>As you develop the plugin, incrementally add types to your JSON specifications and symbol tables. Familiarize yourself with <a href="">my implementation</a> of these files to understand what follows.</p>
+<ol start="13">
+<li>Adding to the <strong>get_objects()</strong> method, catch the neural network objects. Instantiate the objects using the classes you defined for the symbol table. Here, you might use the PyInstanceObject class since PyTorch model instances are guaranteed to have a <strong>_dict_</strong>. In Python, this dictionary holds all the fields of the object.</li>
+</ol>
+<pre><code class="language-python">if tp_name == &quot;Net&quot;:
+    model = context.object(
+        object_type=python_table_name + constants.BANG + &quot;PyInstanceObject&quot;,
+        layer_name=curr_layer.name,
+        offset=PyGC_Head + 16,
+    )
+    models.append((tp_name, model))
+</code></pre>
+<ol start="14">
+<li>For each model, call a function to extract the layers. Begin by dereferencing the dict pointer to get the PyDictObject. The <strong>get_dict()</strong> function recreates the Python dictionary. A model is made up of layers, represented by modules in PyTorch. From <a href="https://github.com/pytorch/pytorch/blob/v2.0.0/torch/nn/modules/module.py#L434">PyTorch source</a>, you know that the dict should contain a <strong>_modules</strong> field, which is another dict. Obtain the modules dict and see that each entry corresponds to a layer of the model.</li>
+</ol>
+<pre><code class="language-python">def get_modules(model):
+    &quot;&quot;&quot;Acquires the modules (ie. layers) of the ML model.
+
+    Args:
+        model: ML model of interest as a PyInstanceObject
+
+    Returns:
+        A list of tuples: (module name, module object)
+    &quot;&quot;&quot;
+    modules = []
+    model_name, model_object = model[0], model[1]
+
+    model_dict = model_object.dict.dereference().get_dict()
+    modules_dict = model_dict['_modules']
+
+    for module in modules_dict:
+        modules.append((model_name + '.' + module, modules_dict[module]))
+
+    return modules
+</code></pre>
+<p><strong>Example Printout:</strong></p>
+<pre><code class="language-python">('Net.conv1', &lt;StructType python-3.10-x641!PyInstanceObject: layer_name_Process3391 @ 0x7fff5160eaa0 #24&gt;)
+('Net.pool', &lt;StructType python-3.10-x641!PyInstanceObject: layer_name_Process3391 @ 0x7fff5160ead0 #24&gt;)
+('Net.conv2', &lt;StructType python-3.10-x641!PyInstanceObject: layer_name_Process3391 @ 0x7fff5160eb00 #24&gt;)
+('Net.lin1', &lt;StructType python-3.10-x641!PyInstanceObject: layer_name_Process3391 @ 0x7fff5160eb30 #24&gt;)
+</code></pre>
+<ol start="15">
+<li>For all modules, begin once more by acquiring the object&rsquo;s dictionary. Through experimentation, you would find that dict fields beginning with a &lsquo;_&rsquo; correspond to methods and dicts, while others are raw attributes. Extract the values of the raw attributes by implementing new symbols for each type (Ex. tuple, long, str). Next, <a href="https://github.com/pytorch/pytorch/blob/main/torch/nn/modules/module.py#L414">PyTorch source</a> indicates there should be a <strong>_parameters</strong> dictionary. This is where tensors such as <a href="https://github.com/pytorch/pytorch/blob/v2.0.0/torch/csrc/api/include/torch/nn/module.h#L43">weights and biases</a> are stored. For each parameter, instantiate your objects, dereference the tensor pointer, and get the tensor&rsquo;s data/values.</li>
+</ol>
+<p><strong>Note:</strong> See my <a href="">PyTorch symbols</a> for the memory repesentation of these objects.</p>
+<pre><code class="language-python">def get_tensors(context, curr_layer, pytorch_table_name, modules):
+    &quot;&quot;&quot;Acquires and displays the tensors and attributes of each module.
+
+    https://github.com/pytorch/pytorch/blob/v2.0.0/torch/csrc/api/include/torch/nn/module.h#L43
+
+    Args:
+        modules: list of the ML model modules/layers as PyInstanceObjects
+
+    Returns:
+        A list of lists of tuples: (parameter name, parameter data)
+        stdout: Attributes and parameters of each module/layer
+    &quot;&quot;&quot;
+    params = []
+    info = ''
+    for module_name, module_object in modules:
+        module_dict = module_object.dict.dereference().get_dict()
+        info += &quot;\n-----------------------------------------------------------------------------------------------------\n\n&quot;
+        info += module_name + &quot; Attributes: \n\n&quot;
+
+        for key in module_dict:
+            if not key.startswith('_'):
+                info += key + ': ' + str(module_dict[key]) + '\n'
+
+        param_dict = module_dict['_parameters']
+        buffer_dict = module_dict['_buffers']
+
+        for k in param_dict:
+            param_name = module_name + '.' + k
+            info += '\n' + k.capitalize() + '\n\n'
+
+            param = context.object(
+                object_type=pytorch_table_name + constants.BANG + &quot;Parameter&quot;,
+                layer_name=curr_layer.name,
+                offset=param_dict[k].vol.offset,
+            )
+            tensor = param.data.dereference()
+            num_elements = tensor.num_elements
+            tensor_data = tensor.get_data()
+            params.append((param_name, tensor_data))
+
+            info += &quot;num_elements: &quot; + str(num_elements) + '\n'
+            info += &quot;data_type: &quot; + tensor.get_type()[0] + '\n\n'
+            info += str(tensor_data) + '\n'
+
+    return info
+</code></pre>
+<p><strong>Example Printout:</strong></p>
+<pre><code class="language-python">Net.conv1 Attributes: 
+
+training: True
+in_channels: 3
+out_channels: 6
+kernel_size: (5, 5)
+stride: (1, 1)
+padding: (0, 0)
+dilation: (1, 1)
+transposed: False
+output_padding: (0, 0)
+groups: 1
+padding_mode: zeros
+
+Weight
+
+num_elements: 450
+data_type: float
+
+[-12.968002319335938, 4.591634678053128e-41 ... ]
+</code></pre>
+<p>The bulk of the work lies in creating the symbol classes that extract and make sense of bytes in memory. Source code is your friend and the only reliable reference for low level implementation details. You have successfully dissected PyTorch ML processes and recovered invaluable model information.</p>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-shell">/volatility3$ bash getpyruntime.sh | xargs -t python3 vol.py -f ~/downloads/memdump.lime linux.pylistobjects --pid 3391 --PyRuntime
+</code></pre>
+
+</article>
+
+                    
+                    
+                    
+
+                    
+
+
+
+                    
+  <div
+    class="-mx-2 mt-4 flex flex-col border-t px-2 pt-4 md:flex-row md:justify-between"
+  >
+    <div>
+      
+        <span class="text-primary-text block font-bold"
+          >Previous</span
+        >
+        <a href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-4/" class="block">Inspect the Memory Image</a>
+      
+    </div>
+    <div class="mt-4 md:mt-0 md:text-right">
+      
+    </div>
+  </div>
+
+
+                    
+
+
+
+                </div>
+                
+            </div>
+
+        </div>
+
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        hljs.highlightAll();
+        changeSidebarHeight();
+        switchDocToc();
+    })
+</script>
+
+
+
+
+
+
+
+
+
+          </div>
+        </div>
+      
+    </main>
+    <footer class="pl-scrollbar">
+      <div class="mx-auto w-full max-w-screen-xl"><div class="text-center p-6 pin-b">
+    <p class="text-sm text-tertiary-text"> Powered by the <a href="https://github.com/wangchucheng/hugo-eureka" class="hover:text-eureka">Eureka</a> theme for <a href="https://gohugo.io" class="hover:text-eureka">Hugo</a></p>
+</div></div>
+    </footer>
+  </body>
+</html>

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
-<title>Docs | Dinko Dermendzhiev</title>
+<title>Inspect the Running Python ML Process | Memory Forensics on ML Processes | Dinko Dermendzhiev</title>
 
 <meta name="generator" content="Hugo Eureka 0.9.3" />
 <link rel="stylesheet" href="https://ddermendzhiev.github.io/css/eureka.min.9cec6350e37e534b0338fa9a085bf06855de3b0f2dcf857e792e5e97b07ea905d4d5513db554cbc26a9c3da622bae92d.css">
@@ -73,39 +73,56 @@
 
 
 <meta name="description"
-  content="Eureka is a elegant and powerful theme for Hugo.">
-
+  content="Use debuggers to get object and process information.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+      "@type": "ListItem",
+      "position": 1 ,
+      "name":"Docs",
+      "item":"https://ddermendzhiev.github.io/docs/"},{
+      "@type": "ListItem",
+      "position": 2 ,
+      "name":"Memory Forensics on ML Processes",
+      "item":"https://ddermendzhiev.github.io/docs/memoryforensicsonml/"},{
+      "@type": "ListItem",
+      "position": 3 ,
+      "name":"Inspect the Running Python ML Process",
+      "item":"https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-2/"}]
+}
+</script>
 
 
 
 <script type="application/ld+json">
 {
-    "@context":"https://schema.org",
-    "@type":"ItemList",
-    "itemListElement":[{
-            "@type":"ListItem",
-            "position":  1 ,
-            "name": "Memory Forensics on ML Processes",
-            "description": "Utilizing the Linux memory forensics toolchain and developing Volatility3 plugins for memory analysis of machine learning models.",
-            "image": "https://ddermendzhiev.github.io/memforensicsfeaturedimagecropped.jpg",
-            "url": "https://ddermendzhiev.github.io/docs/memoryforensicsonml/"
-        }
-    ]
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-2/"
+    },
+    "headline": "Inspect the Running Python ML Process | Memory Forensics on ML Processes | Dinko Dermendzhiev","datePublished": "2023-06-01T00:00:00+00:00",
+    "dateModified": "2023-06-27T00:00:00+00:00",
+    "wordCount":  107 ,
+    "publisher": {
+        "@type": "Person",
+        "name": "Dinko Dermendzhiev",
+        },
+    "description": "Use debuggers to get object and process information."
 }
-</script><meta property="og:title" content="Docs | Dinko Dermendzhiev" />
-<meta property="og:type" content="website" />
+</script><meta property="og:title" content="Inspect the Running Python ML Process | Memory Forensics on ML Processes | Dinko Dermendzhiev" />
+<meta property="og:type" content="article" />
 
 
 
-<meta property="og:url" content="https://ddermendzhiev.github.io/docs/" />
+<meta property="og:url" content="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-2/" />
 
 
 
-
-
-<meta property="og:description" content="Eureka is a elegant and powerful theme for Hugo." />
-
-
+<meta property="og:description" content="Use debuggers to get object and process information." />
 
 
 
@@ -121,14 +138,17 @@
 
 
 
-<meta property="og:updated_time" content="2023-09-01T00:00:00&#43;00:00" />
+<meta property="article:published_time" content="2023-06-01T00:00:00&#43;00:00" />
+
+
+<meta property="article:modified_time" content="2023-06-27T00:00:00&#43;00:00" />
 
 
 
 <meta property="article:section" content="docs" />
 
 
-<link rel="alternate" type="application/rss+xml" href="https://ddermendzhiev.github.io/docs/index.xml" title="Dinko Dermendzhiev" />
+
 
 
   <body class="flex min-h-screen flex-col">
@@ -201,80 +221,226 @@
     <main class="grow pt-16">
         <div class="pl-scrollbar">
           <div class="mx-auto w-full max-w-screen-xl lg:px-4 xl:px-8">
-<article class="prose mx-6 my-8">
-  <h1>Docs</h1>
+
+
+<div class="lg:pt-12">
+    <div class="flex flex-col md:flex-row bg-secondary-bg rounded">
+        <div class="md:w-1/4 lg:w-1/5 border-e">
+            <div class="sticky top-16 pt-6">
+                
+
+
+
+
+
+
+
+
+
+
+<div id="sidebar-title" class="md:hidden mx-4 px-2 pt-4 pb-2 md:border-b text-tertiary-text md:text-primary-text">
+    <span class="font-semibold">Table of Contents</span>
+    <i class='fas fa-caret-right ms-1'></i>
+</div>
+
+<div id="sidebar-toc"
+    class="hidden md:block overflow-y-auto mx-6 md:mx-0 pe-6 pt-2 md:max-h-doc-sidebar bg-primary-bg md:bg-transparent">
+    <div class="flex flex-wrap ms-4 -me-2 p-2 bg-secondary-bg md:bg-primary-bg rounded">
+        <a class=" hover:text-eureka"
+            href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/">Memory Forensics on ML Processes</a>
+        
+        
+        
+
+
+    </div>
+    
+<ul class="ps-6">
+    
+    
+    
+    <li class="py-2">
+        <div class="">
+            <a class=" hover:text-eureka"
+                href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-1/">Build a Convolutional Neural Network</a>
+        </div>
+        
+    </li>
+    
+    
+    
+    
+    <li class="py-2">
+        <div class="">
+            <a class=" text-eureka  hover:text-eureka"
+                href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-2/">Inspect the Running Python ML Process</a>
+        </div>
+        
+    </li>
+    
+    
+    
+    
+    <li class="py-2">
+        <div class="">
+            <a class=" hover:text-eureka"
+                href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-3/">Gather a Memory Image of the System</a>
+        </div>
+        
+    </li>
+    
+    
+    
+    
+    <li class="py-2">
+        <div class="">
+            <a class=" hover:text-eureka"
+                href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-4/">Inspect the Memory Image</a>
+        </div>
+        
+    </li>
+    
+    
+    
+    
+    <li class="py-2">
+        <div class="">
+            <a class=" hover:text-eureka"
+                href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-5/">Develop a Volatility Plugin to Recover ML Models</a>
+        </div>
+        
+    </li>
+    
+    
+</ul>
+
+</div>
+
+
+
+
+
+            </div>
+
+        </div>
+        <div class="w-full md:w-3/4 lg:w-4/5 pb-8 pt-2 md:pt-8">
+            <div class="flex">
+                <div class="w-full lg:w-3/4 px-6">
+                    <article class="prose">
+  <h1 class="mb-4">Inspect the Running Python ML Process</h1>
+
+  <div
+  class="text-tertiary-text not-prose mt-2 flex flex-row flex-wrap items-center"
+>
+  <div class="me-6 my-2">
+    <i class="fas fa-calendar me-1"></i>
+    <span
+      >2023-06-01</span
+    >
+  </div>
+  <div class="me-6 my-2">
+    <i class="fas fa-clock me-1"></i>
+    <span>1 min read</span>
+  </div>
+
   
+
+  
+</div>
+
+
+  
+  
+
+  <ol>
+<li>Set a breakpoint at the forward pass of test data.</li>
+</ol>
+<pre><code class="language-python">images, labels = data
+breakpoint()
+outputs = net(images)               # forward pass of test data
+</code></pre>
+<ol start="2">
+<li>Start the neural network python file using GDB.</li>
+</ol>
+<pre><code class="language-shell">$ gdb python3
+</code></pre>
+<pre><code class="language-shell">(gdb) run [PATH_TO_FILE]/[FILENAME].py
+</code></pre>
+<ol start="3">
+<li>
+<p>When the process reaches the breakpoint you previously set, control will be transferred to PDB. Print out the hex memory locations of a few objects in the Python process.
+<img src="/hex(id(object)).png" alt="image"></p>
+</li>
+<li>
+<p>Print out the fields/attributes of the objects.
+<img src="/dir(object).png" alt="image"></p>
+</li>
+<li>
+<p>Return to GDB by pressing <em>Ctrl + C</em>. Print the PID (process identifier) of the Python process.
+<img src="/infoproc.png" alt="image"></p>
+</li>
+</ol>
+<p>You will later reference the above information to corroborate the results of your memory dump analysis.</p>
+
 </article>
 
-<div class="bg-secondary-bg rounded px-6">
-  <div class="overflow-hidden divide-y">
-  
-  <div class="py-6">
-    <div class="flex flex-col-reverse lg:flex-row justify-between">
-  
-  <div class="w-full lg:w-2/3">
-    <div class="prose">
-  <a href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/" class="no-underline">
-    <h3 class="mt-0">Memory Forensics on ML Processes</h3>
-  </a>
-  
-    Utilizing the Linux memory forensics toolchain and developing Volatility3 plugins for memory analysis of machine learning models.
-  
+                    
+                    
+                    
 
-  
-    <div class="mx-6">
+                    
+
+
+
+                    
+  <div
+    class="-mx-2 mt-4 flex flex-col border-t px-2 pt-4 md:flex-row md:justify-between"
+  >
+    <div>
       
-        <a href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-1/" class="no-underline">
-          <h4>Build a Convolutional Neural Network</h4>
-        </a>
-        
-          Learn the fundamentals of PyTorch for image recognition.
-        
+        <span class="text-primary-text block font-bold"
+          >Previous</span
+        >
+        <a href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-1/" class="block">Build a Convolutional Neural Network</a>
       
-        
-          <div class="-mx-4 my-4 border-t"></div>
-        <a href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-2/" class="no-underline">
-          <h4>Inspect the Running Python ML Process</h4>
-        </a>
-        
-          Use debuggers to get object and process information.
-        
-      
-        
-          <div class="-mx-4 my-4 border-t"></div>
-        <a href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-3/" class="no-underline">
-          <h4>Gather a Memory Image of the System</h4>
-        </a>
-        
-          Acquire a sample with Linux Memory Extractor.
-        
-      
-      <a href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/" class="no-underline">
-        <h4>
-          Read More
-          <i
-            class="fas fa-caret-right ms-1"
-          ></i>
-        </h4>
-      </a>
     </div>
-  
-</div>
-
+    <div class="mt-4 md:mt-0 md:text-right">
+      
+        <span class="text-primary-text block font-bold">Next</span>
+        <a href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-3/" class="block">Gather a Memory Image of the System</a>
+      
+    </div>
   </div>
 
-  
-  <div class="w-full lg:w-1/3 mb-4 lg:mb-0 lg:ms-8">
-    <img src="https://ddermendzhiev.github.io/memforensicsfeaturedimagecropped.jpg" class="w-full" alt="Featured Image">
-  </div>
-  
-</div>
-  </div>
-  
-</div>
+
+                    
 
 
+
+                </div>
+                
+            </div>
+
+        </div>
+
+
+    </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        hljs.highlightAll();
+        changeSidebarHeight();
+        switchDocToc();
+    })
+</script>
+
+
+
+
+
+
 
 
 

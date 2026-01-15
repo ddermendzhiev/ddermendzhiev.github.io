@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  dir="ltr"
+  
+><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<title>Build a Convolutional Neural Network | Memory Forensics on ML Processes | Dinko Dermendzhiev</title>
+
+<meta name="generator" content="Hugo Eureka 0.9.3" />
+<link rel="stylesheet" href="https://ddermendzhiev.github.io/css/eureka.min.9cec6350e37e534b0338fa9a085bf06855de3b0f2dcf857e792e5e97b07ea905d4d5513db554cbc26a9c3da622bae92d.css">
+<script defer src="https://ddermendzhiev.github.io/js/eureka.min.fa9a6bf6d7a50bb635b4cca7d2ba5cf3dfb095ae3798773f1328f7950028b48c17d06276594e1b5f244a25a6c969a705.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload"
+  href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&amp;family=Noto&#43;Serif&#43;SC:wght@400;600;700&amp;display=swap"
+  as="style" onload="this.onload=null;this.rel='stylesheet'">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.4.0/build/styles/base16/solarized-light.min.css"
+   media="print"
+  onload="this.media='all';this.onload=null" crossorigin>
+<script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.4.0/build/highlight.min.js"
+   crossorigin></script>
+  <script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.4.0/build/languages/dart.min.js"
+     crossorigin></script>
+<link rel="stylesheet" href="https://ddermendzhiev.github.io/css/highlightjs.min.2958991528e43eb6fc9b8c4f2b8e052f79c4010718e1d1e888a777620e9ee63021c2c57ec7417a3108019bb8c41943e6.css" media="print" onload="this.media='all';this.onload=null">
+
+
+<script defer type="text/javascript" src="https://ddermendzhiev.github.io/js/fontawesome.min.2eec90e3a2d89beec3a0edb9d29a99ba8e768e800e6177c4300e215277073b35c0ef2b862438363ac7b09eff2084dc3f.js"></script>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css"
+   integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ"  media="print"
+  onload="this.media='all';this.onload=null" crossorigin>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" 
+  integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY"  crossorigin></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js"
+   integrity="sha384-&#43;XBljXPPiv&#43;OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR"  crossorigin></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true }
+      ],
+    });
+  });
+</script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/mermaid@8.14.0/dist/mermaid.min.js" 
+  integrity="sha384-atOyb0FxAgN9LyAc6PEf9BjgwLISyansgdH8/VXQH8p2o5vfrRgmGIJ2Sg22L0A0"  crossorigin></script>
+
+
+
+<meta name="description"
+  content="Learn the fundamentals of PyTorch for image recognition.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+      "@type": "ListItem",
+      "position": 1 ,
+      "name":"Docs",
+      "item":"https://ddermendzhiev.github.io/docs/"},{
+      "@type": "ListItem",
+      "position": 2 ,
+      "name":"Memory Forensics on ML Processes",
+      "item":"https://ddermendzhiev.github.io/docs/memoryforensicsonml/"},{
+      "@type": "ListItem",
+      "position": 3 ,
+      "name":"Build a Convolutional Neural Network",
+      "item":"https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-1/"}]
+}
+</script>
+
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-1/"
+    },
+    "headline": "Build a Convolutional Neural Network | Memory Forensics on ML Processes | Dinko Dermendzhiev","datePublished": "2023-06-01T00:00:00+00:00",
+    "dateModified": "2023-06-27T00:00:00+00:00",
+    "wordCount":  1082 ,
+    "publisher": {
+        "@type": "Person",
+        "name": "Dinko Dermendzhiev",
+        },
+    "description": "Learn the fundamentals of PyTorch for image recognition."
+}
+</script><meta property="og:title" content="Build a Convolutional Neural Network | Memory Forensics on ML Processes | Dinko Dermendzhiev" />
+<meta property="og:type" content="article" />
+
+
+
+<meta property="og:url" content="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-1/" />
+
+
+
+<meta property="og:description" content="Learn the fundamentals of PyTorch for image recognition." />
+
+
+
+<meta property="og:locale" content="en" />
+
+
+
+
+<meta property="og:site_name" content="Dinko Dermendzhiev" />
+
+
+
+
+
+
+<meta property="article:published_time" content="2023-06-01T00:00:00&#43;00:00" />
+
+
+<meta property="article:modified_time" content="2023-06-27T00:00:00&#43;00:00" />
+
+
+
+<meta property="article:section" content="docs" />
+
+
+
+
+
+  <body class="flex min-h-screen flex-col">
+    <header
+      class="min-h-16 pl-scrollbar bg-secondary-bg fixed z-50 flex w-full items-center shadow-sm"
+    >
+      <div class="mx-auto w-full max-w-screen-xl"><script>
+    let storageColorScheme = localStorage.getItem("lightDarkMode")
+    if (((storageColorScheme == 'Auto' || storageColorScheme == null) && window.matchMedia("(prefers-color-scheme: dark)").matches) || storageColorScheme == "Dark") {
+        document.getElementsByTagName('html')[0].classList.add('dark')
+    }
+</script>
+<nav class="flex items-center justify-between flex-wrap px-4 py-4 md:py-0">
+    <a href="/" class="me-6 text-primary-text text-xl font-bold">Dinko Dermendzhiev</a>
+    <button id="navbar-btn" class="md:hidden flex items-center px-3 py-2" aria-label="Open Navbar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div id="target"
+        class="hidden block md:flex md:grow md:justify-between md:items-center w-full md:w-auto text-primary-text z-20">
+        <div class="md:flex md:h-16 text-sm md:grow pb-4 md:pb-0 border-b md:border-b-0">
+            <a href="/docs/" class="block mt-4 md:inline-block md:mt-0 md:h-(16-4px) md:leading-(16-4px) box-border md:border-t-2 md:border-b-2  selected-menu-item  me-4">Docs</a>
+        </div>
+
+        <div class="flex">
+            <div class="relative pt-4 md:pt-0">
+                <div class="cursor-pointer hover:text-eureka" id="lightDarkMode">
+                    <i class="fas fa-adjust"></i>
+                </div>
+                <div class="fixed hidden inset-0 opacity-0 h-full w-full cursor-default z-30" id="is-open">
+                </div>
+                <div class="absolute flex flex-col start-0 md:start-auto end-auto md:end-0 hidden bg-secondary-bg w-48 rounded py-2 border border-tertiary-bg cursor-pointer z-40"
+                    id='lightDarkOptions'>
+                    <span class="px-4 py-1 hover:text-eureka" name="Light">Light</span>
+                    <span class="px-4 py-1 hover:text-eureka" name="Dark">Dark</span>
+                    <span class="px-4 py-1 hover:text-eureka" name="Auto">Auto</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed hidden inset-0 opacity-0 h-full w-full cursor-default z-0" id="is-open-mobile">
+    </div>
+
+</nav>
+<script>
+    
+    let element = document.getElementById('lightDarkMode')
+    if (storageColorScheme == null || storageColorScheme == 'Auto') {
+        document.addEventListener('DOMContentLoaded', () => {
+            window.matchMedia("(prefers-color-scheme: dark)").addEventListener('change', switchDarkMode)
+        })
+    } else if (storageColorScheme == "Light") {
+        element.firstElementChild.classList.remove('fa-adjust')
+        element.firstElementChild.setAttribute("data-icon", 'sun')
+        element.firstElementChild.classList.add('fa-sun')
+    } else if (storageColorScheme == "Dark") {
+        element.firstElementChild.classList.remove('fa-adjust')
+        element.firstElementChild.setAttribute("data-icon", 'moon')
+        element.firstElementChild.classList.add('fa-moon')
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        getcolorscheme();
+        switchBurger();
+    });
+</script>
+</div>
+    </header>
+    <main class="grow pt-16">
+        <div class="pl-scrollbar">
+          <div class="mx-auto w-full max-w-screen-xl lg:px-4 xl:px-8">
+
+
+<div class="lg:pt-12">
+    <div class="flex flex-col md:flex-row bg-secondary-bg rounded">
+        <div class="md:w-1/4 lg:w-1/5 border-e">
+            <div class="sticky top-16 pt-6">
+                
+
+
+
+
+
+
+
+
+
+
+<div id="sidebar-title" class="md:hidden mx-4 px-2 pt-4 pb-2 md:border-b text-tertiary-text md:text-primary-text">
+    <span class="font-semibold">Table of Contents</span>
+    <i class='fas fa-caret-right ms-1'></i>
+</div>
+
+<div id="sidebar-toc"
+    class="hidden md:block overflow-y-auto mx-6 md:mx-0 pe-6 pt-2 md:max-h-doc-sidebar bg-primary-bg md:bg-transparent">
+    <div class="flex flex-wrap ms-4 -me-2 p-2 bg-secondary-bg md:bg-primary-bg rounded">
+        <a class=" hover:text-eureka"
+            href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/">Memory Forensics on ML Processes</a>
+        
+        
+        
+
+
+    </div>
+    
+<ul class="ps-6">
+    
+    
+    
+    <li class="py-2">
+        <div class="">
+            <a class=" text-eureka  hover:text-eureka"
+                href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-1/">Build a Convolutional Neural Network</a>
+        </div>
+        
+    </li>
+    
+    
+    
+    
+    <li class="py-2">
+        <div class="">
+            <a class=" hover:text-eureka"
+                href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-2/">Inspect the Running Python ML Process</a>
+        </div>
+        
+    </li>
+    
+    
+    
+    
+    <li class="py-2">
+        <div class="">
+            <a class=" hover:text-eureka"
+                href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-3/">Gather a Memory Image of the System</a>
+        </div>
+        
+    </li>
+    
+    
+    
+    
+    <li class="py-2">
+        <div class="">
+            <a class=" hover:text-eureka"
+                href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-4/">Inspect the Memory Image</a>
+        </div>
+        
+    </li>
+    
+    
+    
+    
+    <li class="py-2">
+        <div class="">
+            <a class=" hover:text-eureka"
+                href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-5/">Develop a Volatility Plugin to Recover ML Models</a>
+        </div>
+        
+    </li>
+    
+    
+</ul>
+
+</div>
+
+
+
+
+
+            </div>
+
+        </div>
+        <div class="w-full md:w-3/4 lg:w-4/5 pb-8 pt-2 md:pt-8">
+            <div class="flex">
+                <div class="w-full lg:w-3/4 px-6">
+                    <article class="prose">
+  <h1 class="mb-4">Build a Convolutional Neural Network</h1>
+
+  <div
+  class="text-tertiary-text not-prose mt-2 flex flex-row flex-wrap items-center"
+>
+  <div class="me-6 my-2">
+    <i class="fas fa-calendar me-1"></i>
+    <span
+      >2023-06-01</span
+    >
+  </div>
+  <div class="me-6 my-2">
+    <i class="fas fa-clock me-1"></i>
+    <span>6 min read</span>
+  </div>
+
+  
+
+  
+</div>
+
+
+  
+  
+
+  <p>To understand the basics of image-based machine learning and create a process that you can later analyze in memory, you must first build a machine learning model. You will be using PyTorch to create a model for the <a href="https://www.cs.toronto.edu/~kriz/cifar.html">CIFAR10</a> dataset.</p>
+<ol>
+<li>Create a Python file and import the necessary libraries.</li>
+</ol>
+<pre><code class="language-python">import torch
+import torchvision
+import torchvision.transforms as transforms
+</code></pre>
+<ol start="2">
+<li>Download the CIFAR10 train and test datasets and normalize the images.</li>
+</ol>
+<pre><code class="language-python">transform = transforms.Compose(
+    [transforms.ToTensor(),
+     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+
+trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
+                                        download=True, transform=transform)
+testset  = torchvision.datasets.CIFAR10(root='./data', train=False,
+                                        download=True, transform=transform)
+</code></pre>
+<ol start="3">
+<li>For learning purposes, use a 80/10/10 split for the model. This means that 80% of the data will be used to train the model, 10% will be used to validate and tweak hyperparameters, and 10% will be used for testing. PyTorch has already split the CIFAR10 dataset 5:1, so you must merge the default train and test sets in order to achieve the desired split.</li>
+</ol>
+<p><strong>Note:</strong> It is only acceptable to do this because the default sets are identical in format (i.e., they both come labeled).</p>
+<pre><code class="language-python">from math import floor
+from torch.utils.data import random_split
+</code></pre>
+<pre><code class="language-python">dataset  = torch.utils.data.ConcatDataset([trainset, testset])
+
+train_size = floor(len(dataset) * 0.8)  # 48000 training images
+valid_size = floor(len(dataset) * 0.1)  #  6000 validation images
+test_size  = valid_size                 #  6000 testing images
+
+trainset, validset, testset = random_split(dataset, [train_size, valid_size, test_size])
+
+</code></pre>
+<ol start="4">
+<li>The final preparation step is to initialize a DataLoader for each set. These are iterators that will feed batches of data into the model.</li>
+</ol>
+<pre><code class="language-python">batch_size = 4                  # number of images per training iteration
+
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
+                                          shuffle=True, num_workers=2)
+validloader = torch.utils.data.DataLoader(validset, batch_size=batch_size,
+                                          shuffle=False, num_workers=2)
+testloader  = torch.utils.data.DataLoader(testset, batch_size=batch_size,
+                                          shuffle=False, num_workers=2)
+</code></pre>
+<ol start="5">
+<li>Next, you will build a CNN that takes in 3-channel images (RGB) and outputs 10 activation nodes (classes/types). The new class should inherit from <strong>nn.Module</strong> and overwrite the <strong>forward</strong> method.</li>
+</ol>
+<p>In the <strong>_init_</strong> function, define fields (<em>conv1</em>, <em>pool</em>, etc.) that are callable and represent layers and transformations the model should be able to perform. At a high level, here is what they do:</p>
+<table>
+<thead>
+<tr>
+<th>Tranformation</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Conv2d</td>
+<td>applies a 2d convolution over an input image, looking for local features</td>
+</tr>
+<tr>
+<td>MaxPool2d</td>
+<td>applies a 2d max pooling over an input, compressing the input</td>
+</tr>
+<tr>
+<td>Linear</td>
+<td>applies a linear transformation, compressing the input</td>
+</tr>
+<tr>
+<td>relu</td>
+<td>applies an activation function (rectified linear unit), ignores negative values</td>
+</tr>
+<tr>
+<td>flatten</td>
+<td>flattens the dimensions of the input signal</td>
+</tr>
+</tbody>
+</table>
+<p>Learn more: <a href="https://pytorch.org/vision/stable/index.html">https://pytorch.org/vision/stable/index.html</a></p>
+<pre><code class="language-python">import torch.nn as nn
+import torch.nn.functional as F
+
+class Net(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = nn.Conv2d(3, 6, 5)             # in = 3 (RGB), out = 6 (features expected), kernel_size = 5x5
+        self.pool  = nn.MaxPool2d(2, 2)
+        self.conv2 = nn.Conv2d(6, 16, 5)
+        self.lin1  = nn.Linear(16 * 5 * 5, 10)      # out * kernel_size from previous layer -&gt; 10
+
+    def forward(self, x):
+        x = self.pool(F.relu(self.conv1(x)))        # conv1(32x32x3) -&gt; pool(28x28x6) -&gt; 14x14x6
+        x = self.pool(F.relu(self.conv2(x)))        # conv2(14x14x6) -&gt; pool(10x10x16) -&gt; 5x5x16
+        x = torch.flatten(x, 1)                     # flatten(5x5x16) -&gt; 400
+        x = self.lin1(x)                            # lin1(400) -&gt; 10
+
+        return x
+
+# create a CNN instance
+net = Net()
+</code></pre>
+<p>The ordering above is nothing special. Convolution -&gt; Activation Function -&gt; Pooling is a standard sequence for training an image model.</p>
+<ol start="6">
+<li>Now you must define the loss function, hyperparameters, and the optimizer. The loss function is used to quantify the error of the model&rsquo;s predictions. Hyperparameters are parameters that you the human, rather than the model, are in control of. Finally, the optimizer is the algorithm that, given the loss, updates the neural network parameters to improve accuracy.</li>
+</ol>
+<pre><code class="language-python">import torch.optim as optim
+</code></pre>
+<pre><code class="language-python"># loss function
+criterion = nn.CrossEntropyLoss()
+
+# hyperparamters
+lr = 0.001              # learning rate: the magnitude with which parameters are adjusted
+momentum = 0.9          # momentum: the level of inertia/memory present in the optimizer
+epochs = 2              # epochs: the number of times to run through the training data
+
+optimizer = optim.SGD(net.parameters(), lr=lr, momentum=momentum)
+</code></pre>
+<ol start="7">
+<li>The step you&rsquo;ve been waiting for. This is where everything you&rsquo;ve written so far comes together to train and validate the performance of the model.</li>
+</ol>
+<pre><code class="language-python">for epoch in range(epochs):
+
+    # TRAIN
+    running_loss = 0.0
+    for i, data in enumerate(trainloader, 0):
+        images, labels = data
+        optimizer.zero_grad()                         # zero the parameter gradients so they do not accumulate
+
+        # forward + backward + optimize
+        outputs = net(images)
+        loss = criterion(outputs, labels)             # compute loss at the output step
+        loss.backward()                               # compute loss at parameter level for each layer
+                                                      # back propogation of error through graph of funcs
+        optimizer.step()                              # updates the parameters based on loss
+
+        # print statistics
+        running_loss += loss.item()
+        if i % 2000 == 1999:    # print every 2000 mini-batches
+            print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 2000:.3f}')
+            running_loss = 0.0
+
+
+    # VALIDATE
+    total = 0
+    correct = 0
+    for i, data in enumerate(validloader, 0):
+
+        images, labels = data
+        outputs = net(images)
+
+        _, predicted = torch.max(outputs.data, 1)
+        total += labels.size(0)
+        correct += (predicted == labels).sum().item()
+
+    print(f'\nHyperparamters:\n\tbatch_size = {batch_size}\n\tlearning_rate = {lr}\n\tmomentum = {momentum}\n\tepochs = {epochs}')
+    print(f'\nAccuracy of the network on {len(validset)} validation images: {100 * correct // total} %')
+
+print('Finished Training and Validating')
+</code></pre>
+<p><strong>OUTPUT:</strong></p>
+<pre><code class="language-plaintext">[1,  2000] loss: 1.968
+[1,  4000] loss: 1.651
+[1,  6000] loss: 1.516
+[1,  8000] loss: 1.449
+[1, 10000] loss: 1.409
+[1, 12000] loss: 1.390
+
+Hyperparamters:
+    batch_size = 4
+    learning_rate = 0.001
+    momentum = 0.9
+    epochs = 2
+
+Accuracy of the network on 6000 validation images: 50 %
+[2,  2000] loss: 1.306
+[2,  4000] loss: 1.314
+[2,  6000] loss: 1.305
+[2,  8000] loss: 1.292
+[2, 10000] loss: 1.288
+[2, 12000] loss: 1.279
+
+Hyperparamters:
+	batch_size = 4
+	learning_rate = 0.001
+	momentum = 0.9
+	epochs = 2
+
+Accuracy of the network on 6000 validation images: 53 %
+Finished Training and Validating
+</code></pre>
+<p><strong>Note:</strong> With these validation results, now would be the time to iteratively adjust hyperparameters and retrain + revalidate to observe better performance.</p>
+<ol start="8">
+<li>In this step, you test the trained model on novel data it has never seen before.</li>
+</ol>
+<pre><code class="language-python">correct = 0
+total = 0
+# since we're not training, we don't need to calculate the gradients for our outputs
+with torch.no_grad():
+    for data in testloader:
+        images, labels = data
+        outputs = net(images)       # calculate outputs by running images through the network
+
+        _, predicted = torch.max(outputs.data, 1)
+        total += labels.size(0)
+        correct += (predicted == labels).sum().item()
+
+print(f'Accuracy of the network on {len(testset)} test images: {100 * correct // total} %')
+</code></pre>
+<p><strong>OUTPUT:</strong></p>
+<pre><code class="language-plaintext">Accuracy of the network on 6000 test images: 53 %
+</code></pre>
+<p>Given this dataset has 10 classes, random prediction-making would converge to 10% accuracy. At a 53% accuracy, it is obvious the model has learned. If you so desire, continue to tweak hyperparameters and model characteristics to achieve better performance.</p>
+
+</article>
+
+                    
+                    
+                    
+
+                    
+
+
+
+                    
+  <div
+    class="-mx-2 mt-4 flex flex-col border-t px-2 pt-4 md:flex-row md:justify-between"
+  >
+    <div>
+      
+    </div>
+    <div class="mt-4 md:mt-0 md:text-right">
+      
+        <span class="text-primary-text block font-bold">Next</span>
+        <a href="https://ddermendzhiev.github.io/docs/memoryforensicsonml/chapter-2/" class="block">Inspect the Running Python ML Process</a>
+      
+    </div>
+  </div>
+
+
+                    
+
+
+
+                </div>
+                
+            </div>
+
+        </div>
+
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        hljs.highlightAll();
+        changeSidebarHeight();
+        switchDocToc();
+    })
+</script>
+
+
+
+
+
+
+
+
+
+          </div>
+        </div>
+      
+    </main>
+    <footer class="pl-scrollbar">
+      <div class="mx-auto w-full max-w-screen-xl"><div class="text-center p-6 pin-b">
+    <p class="text-sm text-tertiary-text"> Powered by the <a href="https://github.com/wangchucheng/hugo-eureka" class="hover:text-eureka">Eureka</a> theme for <a href="https://gohugo.io" class="hover:text-eureka">Hugo</a></p>
+</div></div>
+    </footer>
+  </body>
+</html>
